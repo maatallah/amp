@@ -1,0 +1,9 @@
+{
+  "app_name": "Auto Music Player",
+  "nav_artists": "Artists",
+  "nav_albums": "Albums",
+  "nav_playlists": "Playlists",
+  "nav_settings": "Settings",
+  "unknown_artist": "Unknown Artist",
+  "unknown_album": "Unknown Album"
+}

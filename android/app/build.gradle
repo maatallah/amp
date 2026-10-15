@@ -1,0 +1,44 @@
+apply plugin: "com.android.application"
+apply plugin: "com.facebook.react"
+
+android {
+    namespace = "com.automusicplayer"
+    compileSdk = 34
+
+    defaultConfig {
+        applicationId = "com.automusicplayer"
+        minSdk = 24
+        targetSdk = 34
+        versionCode = 1
+        versionName = "1.0"
+        ndk {
+            abiFilters "arm64-v8a"
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
+    }
+}
+
+dependencies {
+    implementation("com.facebook.react:react-android")
+    
+    // AndroidX Automotive Framework
+    implementation("androidx.car.app:app:1.4.0")
+    
+    // Media3 Audio Engine
+    implementation("androidx.media3:media3-exoplayer:1.4.0")
+    implementation("androidx.media3:media3-session:1.4.0")
+    
+    // Room Relational Persistence Layer
+    implementation("androidx.room:room-runtime:2.6.1")
+    annotationProcessor("androidx.room:room-compiler:2.6.1")
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}

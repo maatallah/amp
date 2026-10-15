@@ -1,0 +1,21 @@
+# React Native / Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.watchmanconfig
+
+# Android / Gradle
+android/.gradle/
+android/app/build/
+android/build/
+android/.cxx/
+.gradle/
+gradle-8.8/
+*.iml
+.idea/
+local.properties
+
+# OS specific
+.DS_Store
+Thumbs.db

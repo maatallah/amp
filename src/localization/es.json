@@ -1,0 +1,9 @@
+{
+  "app_name": "Reproductor de Música Auto",
+  "nav_artists": "Artistas",
+  "nav_albums": "Álbumes",
+  "nav_playlists": "Listas de reproducción",
+  "nav_settings": "Ajustes",
+  "unknown_artist": "Artista Desconocido",
+  "unknown_album": "Álbum Desconocido"
+}

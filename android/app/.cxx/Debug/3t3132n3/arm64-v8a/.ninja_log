@@ -1,0 +1,12 @@
+# ninja log v5
+7	175	0	M:/dev/AutoMusicPlayer/android/app/.cxx/Debug/3t3132n3/arm64-v8a/CMakeFiles/cmake.verify_globs	68e1c48d84114e21
+524	5456	8137674466371677	build.ninja	e47d6df129a5b99f
+589	3210	8137649268537399	CMakeFiles/appmodules.dir/OnLoad.cpp.o	4ff0e6056dbb8adc
+3212	7918	8137649311652784	M:/dev/AutoMusicPlayer/android/app/build/intermediates/cxx/Debug/3t3132n3/obj/arm64-v8a/libappmodules.so	65bd646ac085dbe7
+442	3133	8137649269054784	CMakeFiles/appmodules.dir/M_/dev/AutoMusicPlayer/android/app/build/generated/autolinking/src/main/jni/autolinking.cpp.o	d0b74c32390f5278
+1	104	0	clean	e6f0d6834f90e5b8
+5	107	0	M:/dev/AutoMusicPlayer/android/app/.cxx/Debug/3t3132n3/arm64-v8a/CMakeFiles/cmake.verify_globs	68e1c48d84114e21
+7	141	0	M:/dev/AutoMusicPlayer/android/app/.cxx/Debug/3t3132n3/arm64-v8a/CMakeFiles/cmake.verify_globs	68e1c48d84114e21
+6	163	0	M:/dev/AutoMusicPlayer/android/app/.cxx/Debug/3t3132n3/arm64-v8a/CMakeFiles/cmake.verify_globs	68e1c48d84114e21
+4	113	0	M:/dev/AutoMusicPlayer/android/app/.cxx/Debug/3t3132n3/arm64-v8a/CMakeFiles/cmake.verify_globs	68e1c48d84114e21
+5	116	0	M:/dev/AutoMusicPlayer/android/app/.cxx/Debug/3t3132n3/arm64-v8a/CMakeFiles/cmake.verify_globs	68e1c48d84114e21

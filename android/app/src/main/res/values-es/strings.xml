@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Reproductor de Música Auto</string>
+    <string name="nav_artists">Artistas</string>
+    <string name="nav_albums">Álbumes</string>
+    <string name="nav_playlists">Listas de reproducción</string>
+    <string name="nav_settings">Ajustes</string>
+    <string name="unknown_artist">Artista Desconocido</string>
+    <string name="unknown_album">Álbum Desconocido</string>
+</resources>
