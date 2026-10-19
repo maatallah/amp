@@ -6,6 +6,7 @@ import android.content.Intent
 import android.media.AudioAttributes
 import android.media.AudioFocusRequest
 import android.media.AudioManager
+import android.net.Uri
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.exoplayer.ExoPlayer
@@ -17,7 +18,8 @@ import com.automusicplayer.database.AppDatabase
 import com.google.common.collect.ImmutableList
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
-import kotlinx.coroutines.Dispatchers
+import com.google.common.util.concurrent.SettableFuture
+import java.util.concurrent.ForkJoinPool
 import kotlinx.coroutines.runBlocking
 
 class PlaybackService : MediaLibraryService() {
@@ -127,28 +129,30 @@ class PlaybackService : MediaLibraryService() {
                     Futures.immediateFuture(LibraryResult.ofItemList(ImmutableList.copyOf(categories), params))
                 }
                 CATEGORY_TRACKS -> {
-                    try {
-                        val dao = AppDatabase.getInstance(applicationContext).musicDao()
-                        val tracks = runBlocking(Dispatchers.IO) {
-                            dao.getAllTracks()
+                    val settableFuture = SettableFuture.create<LibraryResult<ImmutableList<MediaItem>>>()
+                    ForkJoinPool.commonPool().execute {
+                        try {
+                            val dao = AppDatabase.getInstance(applicationContext).musicDao()
+                            val tracks = runBlocking { dao.getAllTracks() }
+                            val mediaItems = tracks.map { track ->
+                                MediaItem.Builder()
+                                    .setMediaId(track.id.toString())
+                                    .setUri(Uri.parse(track.filePath))
+                                    .setMediaMetadata(
+                                        MediaMetadata.Builder()
+                                            .setTitle(track.title)
+                                            .setIsPlayable(true)
+                                            .setIsBrowsable(false)
+                                            .build()
+                                    )
+                                    .build()
+                            }
+                            settableFuture.set(LibraryResult.ofItemList(ImmutableList.copyOf(mediaItems), params))
+                        } catch (e: Exception) {
+                            settableFuture.set(LibraryResult.ofItemList(ImmutableList.of(), params))
                         }
-                        val mediaItems = tracks.map { track ->
-                            MediaItem.Builder()
-                                .setMediaId(track.id.toString())
-                                .setUri(track.filePath)
-                                .setMediaMetadata(
-                                    MediaMetadata.Builder()
-                                        .setTitle(track.title)
-                                        .setIsPlayable(true)
-                                        .setIsBrowsable(false)
-                                        .build()
-                                )
-                                .build()
-                        }
-                        Futures.immediateFuture(LibraryResult.ofItemList(ImmutableList.copyOf(mediaItems), params))
-                    } catch (e: Exception) {
-                        Futures.immediateFuture(LibraryResult.ofItemList(ImmutableList.of(), params))
                     }
+                    settableFuture
                 }
                 else -> {
                     Futures.immediateFuture(LibraryResult.ofItemList(ImmutableList.of(), params))
