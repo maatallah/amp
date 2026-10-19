@@ -1,0 +1,11 @@
+{
+  "app_name": "مشغل الموسيقى للسيارة",
+  "nav_artists": "الفنانون",
+  "nav_albums": "الألبومات",
+  "nav_playlists": "قوائم التشغيل الذكية",
+  "nav_settings": "الإعدادات",
+  "unknown_artist": "فنان غير معروف",
+  "unknown_album": "ألبوم غير معروف",
+  "all_tracks": "كل المقاطع",
+  "drive_mode": "وضع القيادة"
+}

@@ -1,8 +1,9 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import en from '../localization/en.json';
 import es from '../localization/es.json';
+import ar from '../localization/ar.json';
 
-type Locale = 'en' | 'es';
+type Locale = 'en' | 'es' | 'ar';
 type Dictionary = typeof en;
 
 interface LocalizationContextProps {
@@ -11,7 +12,7 @@ interface LocalizationContextProps {
     t: (key: keyof Dictionary) => string;
 }
 
-const dictionaries: Record<Locale, Dictionary> = { en, es };
+const dictionaries: Record<Locale, Dictionary> = { en, es, ar };
 
 const LocalizationContext = createContext<LocalizationContextProps | undefined>(undefined);
 
