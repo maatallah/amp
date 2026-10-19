@@ -7,16 +7,18 @@ import android.media.AudioAttributes
 import android.media.AudioFocusRequest
 import android.media.AudioManager
 import androidx.media3.common.MediaItem
+import androidx.media3.common.MediaMetadata
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.session.LibraryResult
 import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaSession
 import com.automusicplayer.car.AutoCarAppService
 import com.automusicplayer.database.AppDatabase
+import com.google.common.collect.ImmutableList
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class PlaybackService : MediaLibraryService() {
     private var mediaLibrarySession: MediaLibrarySession? = null
@@ -24,6 +26,12 @@ class PlaybackService : MediaLibraryService() {
     private lateinit var audioManager: AudioManager
     private var audioFocusRequest: AudioFocusRequest? = null
     private var originalVolume: Float = 1.0f
+
+    companion object {
+        private const val ROOT_ID = "__ROOT__"
+        private const val CATEGORY_PLAYLISTS = "__PLAYLISTS__"
+        private const val CATEGORY_TRACKS = "__TRACKS__"
+    }
 
     private val audioFocusChangeListener = AudioManager.OnAudioFocusChangeListener { focusChange ->
         when (focusChange) {
@@ -64,8 +72,89 @@ class PlaybackService : MediaLibraryService() {
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
 
-        mediaLibrarySession = MediaLibrarySession.Builder(this, player, object : MediaLibrarySession.Callback {}).setSessionActivity(pendingIntent).build()
+        mediaLibrarySession = MediaLibrarySession.Builder(
+            this,
+            player,
+            LibraryCallback()
+        ).setSessionActivity(pendingIntent).build()
+
         requestAudioFocus()
+    }
+
+    private inner class LibraryCallback : MediaLibrarySession.Callback {
+        override fun onGetLibraryRoot(
+            session: MediaLibrarySession,
+            browser: MediaSession.ControllerInfo,
+            params: LibraryParams?
+        ): ListenableFuture<LibraryResult<MediaItem>> {
+            val rootItem = MediaItem.Builder()
+                .setMediaId(ROOT_ID)
+                .setMediaMetadata(
+                    MediaMetadata.Builder()
+                        .setTitle("Auto Music Root")
+                        .setIsPlayable(false)
+                        .setIsBrowsable(true)
+                        .setFolderType(MediaMetadata.FOLDER_TYPE_MIXED)
+                        .build()
+                )
+                .build()
+            return Futures.immediateFuture(LibraryResult.ofItem(rootItem, params))
+        }
+
+        override fun onGetChildren(
+            session: MediaLibrarySession,
+            browser: MediaSession.ControllerInfo,
+            parentId: String,
+            page: Int,
+            pageSize: Int,
+            params: LibraryParams?
+        ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
+            return when (parentId) {
+                ROOT_ID -> {
+                    val categories = listOf(
+                        MediaItem.Builder()
+                            .setMediaId(CATEGORY_TRACKS)
+                            .setMediaMetadata(
+                                MediaMetadata.Builder()
+                                    .setTitle("All Tracks")
+                                    .setIsPlayable(false)
+                                    .setIsBrowsable(true)
+                                    .setFolderType(MediaMetadata.FOLDER_TYPE_ALBUMS)
+                                    .build()
+                            )
+                            .build()
+                    )
+                    Futures.immediateFuture(LibraryResult.ofItemList(ImmutableList.copyOf(categories), params))
+                }
+                CATEGORY_TRACKS -> {
+                    try {
+                        val dao = AppDatabase.getInstance(applicationContext).musicDao()
+                        val tracks = runBlocking(Dispatchers.IO) {
+                            dao.getAllTracks()
+                        }
+                        val mediaItems = tracks.map { track ->
+                            MediaItem.Builder()
+                                .setMediaId(track.id.toString())
+                                .setUri(track.filePath)
+                                .setMediaMetadata(
+                                    MediaMetadata.Builder()
+                                        .setTitle(track.title)
+                                        .setIsPlayable(true)
+                                        .setIsBrowsable(false)
+                                        .build()
+                                )
+                                .build()
+                        }
+                        Futures.immediateFuture(LibraryResult.ofItemList(ImmutableList.copyOf(mediaItems), params))
+                    } catch (e: Exception) {
+                        Futures.immediateFuture(LibraryResult.ofItemList(ImmutableList.of(), params))
+                    }
+                }
+                else -> {
+                    Futures.immediateFuture(LibraryResult.ofItemList(ImmutableList.of(), params))
+                }
+            }
+        }
     }
 
     private fun requestAudioFocus() {
