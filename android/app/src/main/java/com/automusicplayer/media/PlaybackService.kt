@@ -20,7 +20,6 @@ import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.SettableFuture
 import java.util.concurrent.ForkJoinPool
-import kotlinx.coroutines.runBlocking
 
 class PlaybackService : MediaLibraryService() {
     private var mediaLibrarySession: MediaLibrarySession? = null
@@ -133,7 +132,7 @@ class PlaybackService : MediaLibraryService() {
                     ForkJoinPool.commonPool().execute {
                         try {
                             val dao = AppDatabase.getInstance(applicationContext).musicDao()
-                            val tracks = runBlocking { dao.getAllTracks() }
+                            val tracks = dao.getAllTracks()
                             val mediaItems = tracks.map { track ->
                                 MediaItem.Builder()
                                     .setMediaId(track.id.toString())

@@ -11,7 +11,7 @@ interface MusicDao {
     suspend fun searchTracks(query: String): List<TrackEntity>
 
     @Query("SELECT * FROM tracks ORDER BY date_added DESC")
-    suspend fun getAllTracks(): List<TrackEntity>
+    fun getAllTracks(): List<TrackEntity>
 
     @Query("SELECT * FROM tracks WHERE play_count > :minPlays ORDER BY play_count DESC LIMIT 50")
     suspend fun getMostPlayedTracks(minPlays: Int = 5): List<TrackEntity>
