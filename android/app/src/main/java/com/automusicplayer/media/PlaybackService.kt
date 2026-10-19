@@ -65,6 +65,17 @@ class PlaybackService : MediaLibraryService() {
         audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
         player = ExoPlayer.Builder(this).build()
 
+        player.addListener(object : androidx.media3.common.Player.Listener {
+            override fun onMediaItemTransition(mediaItem: androidx.media3.common.MediaItem?, reason: Int) {
+                if (reason == androidx.media3.common.Player.MEDIA_ITEM_TRANSITION_REASON_AUTO || 
+                    reason == androidx.media3.common.Player.MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED) {
+                    mediaItem?.mediaId?.let { trackIdString ->
+                        logTrackPlaybackTelemetry(trackIdString)
+                    }
+                }
+            }
+        })
+
         val intent = Intent(this, AutoCarAppService::class.java)
         val pendingIntent = PendingIntent.getActivity(
             this,
@@ -80,6 +91,18 @@ class PlaybackService : MediaLibraryService() {
         ).setSessionActivity(pendingIntent).build()
 
         requestAudioFocus()
+    }
+
+    private fun logTrackPlaybackTelemetry(trackIdString: String) {
+        val trackId = trackIdString.toLongOrNull() ?: return
+        ForkJoinPool.commonPool().execute {
+            try {
+                val dao = AppDatabase.getInstance(applicationContext).musicDao()
+                dao.updateTrackTelemetry(trackId, System.currentTimeMillis())
+            } catch (e: Exception) {
+                // Ignore telemetry logging failures
+            }
+        }
     }
 
     private inner class LibraryCallback : MediaLibrarySession.Callback {

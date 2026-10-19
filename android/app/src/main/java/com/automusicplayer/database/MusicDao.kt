@@ -13,6 +13,9 @@ interface MusicDao {
     @Query("SELECT * FROM tracks ORDER BY date_added DESC")
     fun getAllTracks(): List<TrackEntity>
 
+    @Query("UPDATE tracks SET play_count = play_count + 1, last_played = :timestamp WHERE id = :trackId")
+    fun updateTrackTelemetry(trackId: Long, timestamp: Long)
+
     @Query("SELECT * FROM tracks WHERE play_count > :minPlays ORDER BY play_count DESC LIMIT 50")
     suspend fun getMostPlayedTracks(minPlays: Int = 5): List<TrackEntity>
 
