@@ -5,6 +5,8 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.location.LocationListener
+import android.location.LocationManager
 import android.media.AudioAttributes
 import android.media.AudioFocusRequest
 import android.media.AudioManager
@@ -22,6 +24,7 @@ import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.SettableFuture
 import java.util.concurrent.ForkJoinPool
+import kotlin.math.min
 
 class PlaybackService : MediaLibraryService() {
     private var mediaLibrarySession: MediaLibrarySession? = null
@@ -30,10 +33,27 @@ class PlaybackService : MediaLibraryService() {
     private var audioFocusRequest: AudioFocusRequest? = null
     private var originalVolume: Float = 1.0f
 
+    private var locationManager: LocationManager? = null
+    private var lastKnownSpeedMps: Float = 0.0f
+    private val BASE_VOLUME = 1.0f
+    private val MAX_SPEED_KMPH = 120.0f
+
     companion object {
         private const val ROOT_ID = "__ROOT__"
         private const val CATEGORY_PLAYLISTS = "__PLAYLISTS__"
         private const val CATEGORY_TRACKS = "__TRACKS__"
+    }
+
+    private val speedLocationListener = LocationListener { location ->
+        if (location.hasSpeed()) {
+            lastKnownSpeedMps = location.speed
+            val speedKmph = lastKnownSpeedMps * 3.6f
+            
+            if (::player.isInitialized) {
+                val scaleFactor = 1.0f + (min(speedKmph, MAX_SPEED_KMPH) / MAX_SPEED_KMPH) * 0.3f
+                player.volume = BASE_VOLUME * scaleFactor
+            }
+        }
     }
 
     private val powerStateReceiver = object : BroadcastReceiver() {
@@ -100,6 +120,18 @@ class PlaybackService : MediaLibraryService() {
             addAction(Intent.ACTION_POWER_DISCONNECTED)
         }
         registerReceiver(powerStateReceiver, powerFilter)
+
+        try {
+            locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+            locationManager?.requestLocationUpdates(
+                LocationManager.GPS_PROVIDER,
+                2000L,
+                5f,
+                speedLocationListener
+            )
+        } catch (e: SecurityException) {
+            // Location permissions not fully granted by application host yet
+        }
 
         val intent = Intent(this, AutoCarAppService::class.java)
         val pendingIntent = PendingIntent.getActivity(
@@ -231,6 +263,7 @@ class PlaybackService : MediaLibraryService() {
     }
 
     override fun onDestroy() {
+        locationManager?.removeUpdates(speedLocationListener)
         try {
             unregisterReceiver(powerStateReceiver)
         } catch (e: Exception) {
