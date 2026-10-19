@@ -1,8 +1,10 @@
 package com.automusicplayer.media
 
 import android.app.PendingIntent
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.media.AudioAttributes
 import android.media.AudioFocusRequest
 import android.media.AudioManager
@@ -32,6 +34,23 @@ class PlaybackService : MediaLibraryService() {
         private const val ROOT_ID = "__ROOT__"
         private const val CATEGORY_PLAYLISTS = "__PLAYLISTS__"
         private const val CATEGORY_TRACKS = "__TRACKS__"
+    }
+
+    private val powerStateReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            when (intent?.action) {
+                Intent.ACTION_POWER_DISCONNECTED -> {
+                    if (::player.isInitialized && player.isPlaying) {
+                        player.pause()
+                    }
+                }
+                Intent.ACTION_POWER_CONNECTED -> {
+                    if (::player.isInitialized && !player.isPlaying) {
+                        player.prepare()
+                    }
+                }
+            }
+        }
     }
 
     private val audioFocusChangeListener = AudioManager.OnAudioFocusChangeListener { focusChange ->
@@ -75,6 +94,12 @@ class PlaybackService : MediaLibraryService() {
                 }
             }
         })
+
+        val powerFilter = IntentFilter().apply {
+            addAction(Intent.ACTION_POWER_CONNECTED)
+            addAction(Intent.ACTION_POWER_DISCONNECTED)
+        }
+        registerReceiver(powerStateReceiver, powerFilter)
 
         val intent = Intent(this, AutoCarAppService::class.java)
         val pendingIntent = PendingIntent.getActivity(
@@ -206,6 +231,11 @@ class PlaybackService : MediaLibraryService() {
     }
 
     override fun onDestroy() {
+        try {
+            unregisterReceiver(powerStateReceiver)
+        } catch (e: Exception) {
+            // Receiver was already unregistered or not fully initialized
+        }
         abandonAudioFocus()
         mediaLibrarySession?.run {
             player.release()
