@@ -65,25 +65,6 @@ data class CustomTagMapEntity(
 )
 
 @Dao
-interface MusicDao {
-    @Query("SELECT * FROM tracks WHERE title LIKE '%' || :query || '%' ORDER BY title ASC LIMIT 50")
-    suspend fun searchTracks(query: String): List<TrackEntity>
-
-    @Query("SELECT * FROM tracks ORDER BY date_added DESC")
-    suspend fun getAllTracks(): List<TrackEntity>
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertTrack(track: TrackEntity): Long
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertArtist(artist: ArtistEntity): Long
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAlbum(album: AlbumEntity): Long
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertGenre(genre: GenreEntity): Long
-}
 
 @Database(entities = [ArtistEntity::class, AlbumEntity::class, GenreEntity::class, TrackEntity::class, CustomTagMapEntity::class], version = 1)
 abstract class AppDatabase : RoomDatabase() {

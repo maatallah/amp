@@ -2,7 +2,6 @@ package com.automusicplayer
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
-import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint.fabricEnabled
 import com.facebook.react.defaults.DefaultReactActivityDelegate
 
 class MainActivity : ReactActivity() {
@@ -14,14 +13,14 @@ class MainActivity : ReactActivity() {
     override fun getMainComponentName(): String = "AutoMusicPlayer"
 
     /**
-     * Returns the instance of the [ReactActivityDelegate]. We use [DefaultReactActivityDelegate]
-     * to safely handle New Architecture configurations if needed.
+     * Returns the instance of the [ReactActivityDelegate].
+     * Hardcoding fabricEnabled to false ensures absolute runtime safety on 32-bit processors.
      */
     override fun createReactActivityDelegate(): ReactActivityDelegate {
         return DefaultReactActivityDelegate(
             this,
             mainComponentName,
-            fabricEnabled
+            false // Forced to false to completely bypass Bridgeless/CxxInterop crashes
         )
     }
 }

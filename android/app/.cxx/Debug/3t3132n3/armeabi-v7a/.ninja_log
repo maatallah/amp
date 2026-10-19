@@ -1,11 +1,8 @@
 # ninja log v5
-13	158	0	M:/dev/AutoMusicPlayer/android/app/.cxx/Debug/3t3132n3/armeabi-v7a/CMakeFiles/cmake.verify_globs	4a52549a4cfbe9fd
-12	143	0	M:/dev/AutoMusicPlayer/android/app/.cxx/Debug/3t3132n3/armeabi-v7a/CMakeFiles/cmake.verify_globs	4a52549a4cfbe9fd
-189	48754	8137643920682604	CMakeFiles/appmodules.dir/M_/dev/AutoMusicPlayer/android/app/build/generated/autolinking/src/main/jni/autolinking.cpp.o	3ca9476a79835133
-4	48809	8137643922462055	CMakeFiles/appmodules.dir/OnLoad.cpp.o	75a32e5b471fa1cc
-48811	51933	8137643962186985	M:/dev/AutoMusicPlayer/android/app/build/intermediates/cxx/Debug/3t3132n3/obj/armeabi-v7a/libappmodules.so	6b6eee2fe01f25ff
-39	24995	8137644065785803	CMakeFiles/appmodules.dir/M_/dev/AutoMusicPlayer/android/app/build/generated/autolinking/src/main/jni/autolinking.cpp.o	3ca9476a79835133
-6	25041	8137644065730076	CMakeFiles/appmodules.dir/OnLoad.cpp.o	75a32e5b471fa1cc
-25043	25838	8137644077246759	M:/dev/AutoMusicPlayer/android/app/build/intermediates/cxx/Debug/3t3132n3/obj/armeabi-v7a/libappmodules.so	6b6eee2fe01f25ff
-16	413	0	M:/dev/AutoMusicPlayer/android/app/.cxx/Debug/3t3132n3/armeabi-v7a/CMakeFiles/cmake.verify_globs	4a52549a4cfbe9fd
-1	126	0	clean	e6f0d6834f90e5b8
+5	126	0	M:/dev/AutoMusicPlayer/android/app/.cxx/Debug/3t3132n3/armeabi-v7a/CMakeFiles/cmake.verify_globs	4a52549a4cfbe9fd
+1	43	0	clean	e6f0d6834f90e5b8
+89	1462	8138652887235221	CMakeFiles/appmodules.dir/M_/dev/AutoMusicPlayer/android/app/build/generated/autolinking/src/main/jni/autolinking.cpp.o	3ca9476a79835133
+54	1055	8138652883456299	CMakeFiles/appmodules.dir/OnLoad.cpp.o	75a32e5b471fa1cc
+136	3365	8141006372568899	build.ninja	862b7d0b5f0b05b0
+1464	2716	8138652899694413	M:/dev/AutoMusicPlayer/android/app/build/intermediates/cxx/Debug/3t3132n3/obj/armeabi-v7a/libappmodules.so	6b6eee2fe01f25ff
+5	127	0	M:/dev/AutoMusicPlayer/android/app/.cxx/Debug/3t3132n3/armeabi-v7a/CMakeFiles/cmake.verify_globs	4a52549a4cfbe9fd
