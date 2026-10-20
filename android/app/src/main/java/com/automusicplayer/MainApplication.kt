@@ -1,6 +1,7 @@
 package com.automusicplayer
 
 import android.app.Application
+import android.content.Context
 import com.facebook.react.PackageList
 import com.facebook.react.ReactApplication
 import com.facebook.react.ReactHost
@@ -25,8 +26,12 @@ class MainApplication : Application(), ReactApplication {
     override val reactHost: ReactHost
         get() = getDefaultReactHost(applicationContext, reactNativeHost)
 
+    override fun attachBaseContext(base: Context?) {
+        SoLoader.init(base, /* native exopackage */ false)
+        super.attachBaseContext(base)
+    }
+
     override fun onCreate() {
-        SoLoader.init(this, false)
         super.onCreate()
     }
 }
