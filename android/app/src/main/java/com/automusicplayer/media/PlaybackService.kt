@@ -1,5 +1,7 @@
 package com.automusicplayer.media
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -12,6 +14,8 @@ import android.media.AudioAttributes
 import android.media.AudioFocusRequest
 import android.media.AudioManager
 import android.net.Uri
+import android.os.Build
+import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
@@ -101,8 +105,36 @@ class PlaybackService : MediaLibraryService() {
         }
     }
 
+    private fun createNotificationChannelAndStartForeground() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channelId = "amp_playback_channel"
+            val channelName = "Automotive Player Service"
+            val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            
+            if (manager.getNotificationChannel(channelId) == null) {
+                val channel = NotificationChannel(
+                    channelId, 
+                    channelName, 
+                    NotificationManager.IMPORTANCE_LOW
+                )
+                manager.createNotificationChannel(channel)
+            }
+            
+            val notification = NotificationCompat.Builder(this, channelId)
+                .setSmallIcon(android.R.drawable.ic_media_play)
+                .setContentTitle("AMP Active")
+                .setContentText("Automotive Background Media Engine Operational")
+                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .build()
+                
+            startForeground(1, notification)
+        }
+    }
+
     override fun onCreate() {
         super.onCreate()
+        createNotificationChannelAndStartForeground()
+
         audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
         player = ExoPlayer.Builder(this).build()
 
