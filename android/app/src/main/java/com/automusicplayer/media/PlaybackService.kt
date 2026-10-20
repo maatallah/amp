@@ -5,12 +5,14 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.PackageManager
 import android.location.LocationListener
 import android.location.LocationManager
 import android.media.AudioAttributes
 import android.media.AudioFocusRequest
 import android.media.AudioManager
 import android.net.Uri
+import androidx.core.content.ContextCompat
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.exoplayer.ExoPlayer
@@ -121,16 +123,24 @@ class PlaybackService : MediaLibraryService() {
         }
         registerReceiver(powerStateReceiver, powerFilter)
 
-        try {
-            locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-            locationManager?.requestLocationUpdates(
-                LocationManager.GPS_PROVIDER,
-                2000L,
-                5f,
-                speedLocationListener
-            )
-        } catch (e: SecurityException) {
-            // Location permissions not fully granted by application host yet
+        val fineLocationCheck = ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
+        val coarseLocationCheck = ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION)
+
+        if (fineLocationCheck == PackageManager.PERMISSION_GRANTED || 
+            coarseLocationCheck == PackageManager.PERMISSION_GRANTED) {
+            try {
+                locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+                locationManager?.requestLocationUpdates(
+                    LocationManager.GPS_PROVIDER,
+                    2000L,
+                    5f,
+                    speedLocationListener
+                )
+            } catch (e: SecurityException) {
+                // Fallback protection
+            }
+        } else {
+            // Permissions not granted yet. Defer speed scaling until requested.
         }
 
         val intent = Intent(this, AutoCarAppService::class.java)
