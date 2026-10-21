@@ -1,12 +1,11 @@
 # ninja log v5
-5	422	0	M:/dev/AutoMusicPlayer/android/app/.cxx/Debug/3t3132n3/arm64-v8a/CMakeFiles/cmake.verify_globs	68e1c48d84114e21
-50922	55329	8142851691647574	M:/dev/AutoMusicPlayer/android/app/build/intermediates/cxx/Debug/3t3132n3/obj/arm64-v8a/libappmodules.so	65bd646ac085dbe7
-1287	50865	8142851646318162	CMakeFiles/appmodules.dir/OnLoad.cpp.o	4ff0e6056dbb8adc
-1051	22037	8142878358759008	build.ninja	e47d6df129a5b99f
-1	53	0	clean	e6f0d6834f90e5b8
-1078	50921	8142851646718789	CMakeFiles/appmodules.dir/M_/dev/AutoMusicPlayer/android/app/build/generated/autolinking/src/main/jni/autolinking.cpp.o	d0b74c32390f5278
-423	4879	8142878358759008	build.ninja	e47d6df129a5b99f
-5	880	0	M:/dev/AutoMusicPlayer/android/app/.cxx/Debug/3t3132n3/arm64-v8a/CMakeFiles/cmake.verify_globs	68e1c48d84114e21
+5	139	0	M:/dev/AutoMusicPlayer/android/app/.cxx/Debug/3t3132n3/arm64-v8a/CMakeFiles/cmake.verify_globs	68e1c48d84114e21
+423	4879	8142912592114231	build.ninja	e47d6df129a5b99f
 239	17890	8142878551043737	CMakeFiles/appmodules.dir/OnLoad.cpp.o	4ff0e6056dbb8adc
-315	17900	8142878551043737	CMakeFiles/appmodules.dir/M_/dev/AutoMusicPlayer/android/app/build/generated/autolinking/src/main/jni/autolinking.cpp.o	d0b74c32390f5278
 17902	21420	8142878588148943	M:/dev/AutoMusicPlayer/android/app/build/intermediates/cxx/Debug/3t3132n3/obj/arm64-v8a/libappmodules.so	65bd646ac085dbe7
+315	17900	8142878551043737	CMakeFiles/appmodules.dir/M_/dev/AutoMusicPlayer/android/app/build/generated/autolinking/src/main/jni/autolinking.cpp.o	d0b74c32390f5278
+1	61	0	clean	e6f0d6834f90e5b8
+13	244	0	M:/dev/AutoMusicPlayer/android/app/.cxx/Debug/3t3132n3/arm64-v8a/CMakeFiles/cmake.verify_globs	68e1c48d84114e21
+157	17068	8142912787720287	CMakeFiles/appmodules.dir/OnLoad.cpp.o	4ff0e6056dbb8adc
+384	17085	8142912787871485	CMakeFiles/appmodules.dir/M_/dev/AutoMusicPlayer/android/app/build/generated/autolinking/src/main/jni/autolinking.cpp.o	d0b74c32390f5278
+17088	20220	8142912819943665	M:/dev/AutoMusicPlayer/android/app/build/intermediates/cxx/Debug/3t3132n3/obj/arm64-v8a/libappmodules.so	65bd646ac085dbe7
