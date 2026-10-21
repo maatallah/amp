@@ -132,64 +132,72 @@ class PlaybackService : MediaLibraryService() {
     }
 
     override fun onCreate() {
-        super.onCreate()
-        createNotificationChannelAndStartForeground()
+        FileLogger.log(this, "PlaybackService onCreate() called - executing foreground validation...")
+        try {
+            createNotificationChannelAndStartForeground()
 
-        audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        player = ExoPlayer.Builder(this).build()
+            audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+            player = ExoPlayer.Builder(this).build()
 
-        player.addListener(object : androidx.media3.common.Player.Listener {
-            override fun onMediaItemTransition(mediaItem: androidx.media3.common.MediaItem?, reason: Int) {
-                if (reason == androidx.media3.common.Player.MEDIA_ITEM_TRANSITION_REASON_AUTO || 
-                    reason == androidx.media3.common.Player.MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED) {
-                    mediaItem?.mediaId?.let { trackIdString ->
-                        logTrackPlaybackTelemetry(trackIdString)
+            player.addListener(object : androidx.media3.common.Player.Listener {
+                override fun onMediaItemTransition(mediaItem: androidx.media3.common.MediaItem?, reason: Int) {
+                    if (reason == androidx.media3.common.Player.MEDIA_ITEM_TRANSITION_REASON_AUTO || 
+                        reason == androidx.media3.common.Player.MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED) {
+                        mediaItem?.mediaId?.let { trackIdString ->
+                            logTrackPlaybackTelemetry(trackIdString)
+                        }
                     }
                 }
+            })
+
+            val powerFilter = IntentFilter().apply {
+                addAction(Intent.ACTION_POWER_CONNECTED)
+                addAction(Intent.ACTION_POWER_DISCONNECTED)
             }
-        })
+            registerReceiver(powerStateReceiver, powerFilter)
 
-        val powerFilter = IntentFilter().apply {
-            addAction(Intent.ACTION_POWER_CONNECTED)
-            addAction(Intent.ACTION_POWER_DISCONNECTED)
-        }
-        registerReceiver(powerStateReceiver, powerFilter)
+            val fineLocationCheck = ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
+            val coarseLocationCheck = ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION)
 
-        val fineLocationCheck = ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
-        val coarseLocationCheck = ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION)
-
-        if (fineLocationCheck == PackageManager.PERMISSION_GRANTED || 
-            coarseLocationCheck == PackageManager.PERMISSION_GRANTED) {
-            try {
-                locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-                locationManager?.requestLocationUpdates(
-                    LocationManager.GPS_PROVIDER,
-                    2000L,
-                    5f,
-                    speedLocationListener
-                )
-            } catch (e: SecurityException) {
-                // Fallback protection
+            if (fineLocationCheck == PackageManager.PERMISSION_GRANTED || 
+                coarseLocationCheck == PackageManager.PERMISSION_GRANTED) {
+                try {
+                    locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+                    locationManager?.requestLocationUpdates(
+                        LocationManager.GPS_PROVIDER,
+                        2000L,
+                        5f,
+                        speedLocationListener
+                    )
+                } catch (e: SecurityException) {
+                    // Fallback protection
+                }
+            } else {
+                // Permissions not granted yet. Defer speed scaling until requested.
             }
-        } else {
-            // Permissions not granted yet. Defer speed scaling until requested.
+
+            val intent = Intent(this, AutoCarAppService::class.java)
+            val pendingIntent = PendingIntent.getActivity(
+                this,
+                0,
+                intent,
+                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+            )
+
+            mediaLibrarySession = MediaLibrarySession.Builder(
+                this,
+                player,
+                LibraryCallback()
+            ).setSessionActivity(pendingIntent).build()
+
+            requestAudioFocus()
+
+            FileLogger.log(this, "PlaybackService successfully moved to foreground.")
+        } catch (t: Throwable) {
+            FileLogger.logThrowable(this, "CRITICAL BACKGROUND SERVICE CRASH CAUGHT", t)
+            throw t // Rethrow to preserve standard thread boundaries
         }
-
-        val intent = Intent(this, AutoCarAppService::class.java)
-        val pendingIntent = PendingIntent.getActivity(
-            this,
-            0,
-            intent,
-            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-        )
-
-        mediaLibrarySession = MediaLibrarySession.Builder(
-            this,
-            player,
-            LibraryCallback()
-        ).setSessionActivity(pendingIntent).build()
-
-        requestAudioFocus()
+        super.onCreate()
     }
 
     private fun logTrackPlaybackTelemetry(trackIdString: String) {

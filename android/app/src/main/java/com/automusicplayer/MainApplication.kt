@@ -2,6 +2,7 @@ package com.automusicplayer
 
 import android.app.Application
 import android.content.Context
+import com.automusicplayer.media.FileLogger
 import com.facebook.react.PackageList
 import com.facebook.react.ReactApplication
 import com.facebook.react.ReactHost
@@ -27,11 +28,23 @@ class MainApplication : Application(), ReactApplication {
         get() = getDefaultReactHost(applicationContext, reactNativeHost)
 
     override fun attachBaseContext(base: Context?) {
-        SoLoader.init(base, /* native exopackage */ false)
+        base?.let { 
+            FileLogger.log(it, "========= APPLICATION ENGINE BOOT =========")
+            FileLogger.log(it, "Attempting early native library loader binding...")
+        }
+        
+        try {
+            SoLoader.init(base, false)
+            base?.let { FileLogger.log(it, "SoLoader bound successfully.") }
+        } catch (t: Throwable) {
+            base?.let { FileLogger.logThrowable(it, "CRITICAL LIFE CYCLE EXCEPTION: Early SoLoader binding aborted!", t) }
+        }
+        
         super.attachBaseContext(base)
     }
 
     override fun onCreate() {
         super.onCreate()
+        FileLogger.log(this, "MainApplication onCreate() reached cleanly.")
     }
 }
